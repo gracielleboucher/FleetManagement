@@ -56,5 +56,52 @@ public class Boat implements Serializable {
         this.expenses = 0.0;
     } //end of the Boat() w/ given details constructor
 
+    /**
+     * Gets the name of the boat.
+     *
+     * @return the name of the boat
+     */
+    public String getName() {
+        return name;
+    } //end of getName
+
+    /**
+     * Gets the price the club paid for the boat.
+     *
+     * @return the purchase price
+     */
+    public double getPurchasePrice() {
+        return purchasePrice;
+    } //end of getPurchasePrice
+
+    /**
+     * Gets the total spent maintaining the boat.
+     *
+     * @return the total expenses
+     */
+    public double getExpenses() {
+        return expenses;
+    } //end of getExpenses
+
+    /**
+     * Checks whether an amount can be spent on the boat under the Commodore's policy
+     * that no more may be spent than the boat cost.
+     *
+     * @param amount the amount the Commodore wants to spend
+     * @return true if the expense is allowed, false if not
+     */
+    public boolean canSpend(double amount) {
+        return expenses + amount <= purchasePrice;
+    } //end of canSpend
+
+    /**
+     * Adds an approved amount to the boat's expenses.
+     *
+     * @param amount the amount spent
+     */
+    public void spend(double amount) {
+        expenses += amount;
+    } //end of spend
+
 
 } //end of the Boat class
