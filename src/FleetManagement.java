@@ -16,6 +16,9 @@ public class FleetManagement {
     /** The keyboard Scanner. */
     private static final Scanner keyboard = new Scanner(System.in);
 
+    /** The format for the prompts */
+    private static final String PROMPT_FORMAT = "%-44s: ";
+
     /**
      * Runs the Fleet Management System.
      *
@@ -49,11 +52,11 @@ public class FleetManagement {
                     System.out.println();
                     break;
                 case "A":
-                    System.out.println("Add chosen");
+                    addBoat(fleet);
                     System.out.println();
                     break;
                 case "R":
-                    System.out.println("Remove chosen");
+                    removeBoat(fleet);
                     System.out.println();
                     break;
                 case "E":
@@ -133,5 +136,55 @@ public class FleetManagement {
         }
         System.out.printf("    %-49s : Paid $%9.2f : Spent $%9.2f%n", "Total", totalPaid, totalSpent);
     } //end of printFleet
+
+    /**
+     * Adds a new boat to the fleet from CSV data typed by the Commodore.
+     *
+     * @param fleet the fleet of boats
+     */
+    private static void addBoat(ArrayList<Boat> fleet) {
+
+        System.out.printf(PROMPT_FORMAT, "Please enter the new boat CSV data");
+        fleet.add(makeBoat(keyboard.nextLine()));
+    } //end of addBoat
+
+    /**
+     * Removes a boat from the fleet, chosen by name.
+     *
+     * @param fleet the fleet of boats
+     */
+    private static void removeBoat(ArrayList<Boat> fleet) {
+
+        String name;
+        Boat boat;
+
+        System.out.printf(PROMPT_FORMAT, "Which boat do you want to remove?");
+        name = keyboard.nextLine();
+        boat = findBoat(fleet, name);
+        if (boat == null) {
+            System.out.println("Cannot find boat " + name);
+        } else {
+            fleet.remove(boat);
+        }
+    } //end of removeBoat
+
+    /**
+     * Finds a boat in the fleet by name
+     *
+     * @param fleet the fleet of boats
+     * @param name the name of the boat to find
+     * @return the boat with that name, or null if it is not in the fleet
+     */
+    private static Boat findBoat(ArrayList<Boat> fleet, String name) {
+
+        int index;
+
+        for(index = 0; index < fleet.size(); index++) {
+            if (fleet.get(index).getName().toUpperCase().equals(name.toUpperCase())) {
+                return fleet.get(index);
+            }
+        }
+        return null;
+    } //end of findBoat
 
 } //end of the FleetManagement class
