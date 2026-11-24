@@ -7,4 +7,4 @@
 public enum BoatType {
     SAILING,
     POWER
-}
+} //end of the BoatType enum
