@@ -103,5 +103,15 @@ public class Boat implements Serializable {
         expenses += amount;
     } //end of spend
 
+    /**
+     * Describes the boat as one line of the fleet report.
+     *
+     * @return the boat's type, name, year, make/model, length, purchase price, and expenses
+     */
+    public String toString() {
+        return String.format("    %-7s %-20s %4d %-10s %3d' : Paid $%9.2f : Spent $%9.2f", type,
+                name, year, makeModel, length, purchasePrice, expenses);
+    } //end of toString
+
 
 } //end of the Boat class
