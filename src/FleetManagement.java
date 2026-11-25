@@ -16,7 +16,7 @@ public class FleetManagement {
     /** The keyboard Scanner. */
     private static final Scanner keyboard = new Scanner(System.in);
 
-    /** The format for the prompts */
+    /** The format for the prompts. */
     private static final String PROMPT_FORMAT = "%-44s: ";
 
     /**
@@ -60,7 +60,7 @@ public class FleetManagement {
                     System.out.println();
                     break;
                 case "E":
-                    System.out.println("Expense chosen");
+                    requestExpense(fleet);
                     System.out.println();
                     break;
                 case "X":
@@ -169,7 +169,36 @@ public class FleetManagement {
     } //end of removeBoat
 
     /**
-     * Finds a boat in the fleet by name
+     * Asks which boat to spend on and how much, and spends it if the boat can afford it.
+     *
+     * @param fleet the fleet of boats
+     */
+    private static void requestExpense(ArrayList<Boat> fleet) {
+
+        String name;
+        Boat boat;
+        double amount;
+
+        System.out.printf(PROMPT_FORMAT, "Which boat do you want to spend on?");
+        name = keyboard.nextLine();
+        boat = findBoat(fleet, name);
+        if (boat == null) {
+            System.out.println("Cannot find boat " + name);
+        } else {
+            System.out.printf(PROMPT_FORMAT, "How much do you want to spend?");
+            amount = Double.parseDouble(keyboard.nextLine());
+            if (boat.canSpend(amount)) {
+                boat.spend(amount);
+                System.out.printf("Expense authorized, $%.2f spent.%n", boat.getExpenses());
+            } else {
+                System.out.printf("Expense not permitted, only $%.2f left to spend.%n",
+                        boat.getPurchasePrice() - boat.getExpenses());
+            }
+        }
+    } //end of requestExpense
+
+    /**
+     * Finds a boat in the fleet by name.
      *
      * @param fleet the fleet of boats
      * @param name the name of the boat to find
@@ -179,7 +208,7 @@ public class FleetManagement {
 
         int index;
 
-        for(index = 0; index < fleet.size(); index++) {
+        for (index = 0; index < fleet.size(); index++) {
             if (fleet.get(index).getName().toUpperCase().equals(name.toUpperCase())) {
                 return fleet.get(index);
             }
