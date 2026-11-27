@@ -2,6 +2,9 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 /**
  * The Fleet Management System for the Coconut Grove Sailing Club.
@@ -18,6 +21,9 @@ public class FleetManagement {
 
     /** The format for the prompts. */
     private static final String PROMPT_FORMAT = "%-44s: ";
+
+    /** The name of the file the fleet is saved to between runs. */
+    private static final String DB_FILE_NAME = "FleetData.db";
 
     /**
      * Runs the Fleet Management System.
@@ -38,7 +44,7 @@ public class FleetManagement {
         if (args.length > 0) {
             fleet = loadFromCSV(args[0]);
         } else {
-            fleet = new ArrayList<>();
+            fleet = loadFromDB(DB_FILE_NAME);
         }
 
         //Menu loop, repeats until the Commodore chooses X
@@ -72,6 +78,9 @@ public class FleetManagement {
             }
         } while (!option.equals("X"));
 
+        //Save the fleet for the next run.
+        saveToDB(DB_FILE_NAME, fleet);
+
         //Exit message
         System.out.println("Exiting the Fleet Management System");
     } //end of the main method
@@ -102,6 +111,65 @@ public class FleetManagement {
 
         return fleet;
     } //end of loadFromCSV
+
+    /**
+     * Saves the fleet to the DB file so it can be loaded on the next run.
+     *
+     * @param fileName the name of the DB file
+     * @param fleet the fleet of boats
+     */
+    private static void saveToDB(String fileName, ArrayList<Boat> fleet) {
+
+        ObjectOutputStream toStream = null;
+
+        try {
+            toStream = new ObjectOutputStream(new FileOutputStream(fileName));
+            toStream.writeObject(fleet);
+        } catch (IOException e) {
+            System.out.println("ERROR saving " + e.getMessage());
+        } finally {
+            if (toStream != null) {
+                try {
+                    toStream.close();
+                } catch (IOException e) {
+                    System.out.println("ERROR closing " + e.getMessage());
+                }
+            }
+        }
+    } //end of saveToDB
+
+    /**
+     * Loads the fleet from the DB file saved on the last run.
+     *
+     * @param fileName the name of the DB file
+     * @return the fleet of boats, or an empty fleet if the file cannot be read
+     */
+    private static ArrayList<Boat> loadFromDB(String fileName) {
+
+        ObjectInputStream fromStream = null;
+        ArrayList<Boat> fleet;
+
+        try {
+            fromStream = new ObjectInputStream(new FileInputStream(fileName));
+            fleet = (ArrayList<Boat>) fromStream.readObject();
+        } catch (IOException e) {
+            System.out.println("ERROR loading " + e.getMessage());
+            fleet = new ArrayList<>();
+        } catch (ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+            fleet = new ArrayList<>();
+        } finally {
+            if (fromStream != null) {
+                try {
+                    fromStream.close();
+                } catch (IOException e) {
+                    System.out.println("ERROR closing " + e.getMessage());
+                }
+            }
+        }
+
+        return fleet;
+    } //end of loadFromDB
 
     /**
      * Makes a boat from one line of CSV data.
