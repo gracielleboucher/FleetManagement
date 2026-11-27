@@ -16,13 +16,19 @@ import java.io.ObjectOutputStream;
  */
 public class FleetManagement {
 
-    /** The keyboard Scanner. */
+    /**
+     * The keyboard Scanner.
+     */
     private static final Scanner keyboard = new Scanner(System.in);
 
-    /** The format for the prompts. */
+    /**
+     * The format for the prompts.
+     */
     private static final String PROMPT_FORMAT = "%-44s: ";
 
-    /** The name of the file the fleet is saved to between runs. */
+    /**
+     * The name of the file the fleet is saved to between runs.
+     */
     private static final String DB_FILE_NAME = "FleetData.db";
 
     /**
@@ -40,7 +46,7 @@ public class FleetManagement {
         System.out.println("--------------------------------------");
         System.out.println();
 
-        //Load the fleet from the CSV file
+        //Load the fleet from the CSV file, or from the DB file on later runs
         if (args.length > 0) {
             fleet = loadFromCSV(args[0]);
         } else {
@@ -78,7 +84,7 @@ public class FleetManagement {
             }
         } while (!option.equals("X"));
 
-        //Save the fleet for the next run.
+        //Save the fleet for the next run
         saveToDB(DB_FILE_NAME, fleet);
 
         //Exit message
@@ -98,6 +104,7 @@ public class FleetManagement {
 
         try {
             csvFile = new Scanner(new FileInputStream(fileName));
+            //Read one boat per line until the end of the file
             while (csvFile.hasNextLine()) {
                 fleet.add(makeBoat(csvFile.nextLine()));
             }
@@ -116,7 +123,7 @@ public class FleetManagement {
      * Saves the fleet to the DB file so it can be loaded on the next run.
      *
      * @param fileName the name of the DB file
-     * @param fleet the fleet of boats
+     * @param fleet    the fleet of boats
      */
     private static void saveToDB(String fileName, ArrayList<Boat> fleet) {
 
@@ -124,6 +131,7 @@ public class FleetManagement {
 
         try {
             toStream = new ObjectOutputStream(new FileOutputStream(fileName));
+            //Write the whole fleet in one shot
             toStream.writeObject(fleet);
         } catch (IOException e) {
             System.out.println("ERROR saving " + e.getMessage());
@@ -151,6 +159,7 @@ public class FleetManagement {
 
         try {
             fromStream = new ObjectInputStream(new FileInputStream(fileName));
+            //Read the whole fleet back in one shot
             fleet = (ArrayList<Boat>) fromStream.readObject();
         } catch (IOException e) {
             System.out.println("ERROR loading " + e.getMessage());
@@ -179,6 +188,7 @@ public class FleetManagement {
      */
     private static Boat makeBoat(String csvLine) {
 
+        //Split the line into its six parts
         String[] parts = csvLine.split(",");
         return new Boat(BoatType.valueOf(parts[0]), parts[1], Integer.parseInt(parts[2]), parts[3],
                 Integer.parseInt(parts[4]), Double.parseDouble(parts[5]));
@@ -197,6 +207,7 @@ public class FleetManagement {
 
         System.out.println();
         System.out.println("Fleet report:");
+        //Print each boat and add up the totals
         for (index = 0; index < fleet.size(); index++) {
             System.out.println(fleet.get(index));
             totalPaid += fleet.get(index).getPurchasePrice();
@@ -229,6 +240,7 @@ public class FleetManagement {
         System.out.printf(PROMPT_FORMAT, "Which boat do you want to remove?");
         name = keyboard.nextLine();
         boat = findBoat(fleet, name);
+        //Remove the boat only if it was found
         if (boat == null) {
             System.out.println("Cannot find boat " + name);
         } else {
@@ -255,6 +267,7 @@ public class FleetManagement {
         } else {
             System.out.printf(PROMPT_FORMAT, "How much do you want to spend?");
             amount = Double.parseDouble(keyboard.nextLine());
+            //Only spend if the boat can afford it
             if (boat.canSpend(amount)) {
                 boat.spend(amount);
                 System.out.printf("Expense authorized, $%.2f spent.%n", boat.getExpenses());
@@ -269,7 +282,7 @@ public class FleetManagement {
      * Finds a boat in the fleet by name.
      *
      * @param fleet the fleet of boats
-     * @param name the name of the boat to find
+     * @param name  the name of the boat to find
      * @return the boat with that name, or null if it is not in the fleet
      */
     private static Boat findBoat(ArrayList<Boat> fleet, String name) {
@@ -277,6 +290,7 @@ public class FleetManagement {
         int index;
 
         for (index = 0; index < fleet.size(); index++) {
+            //Compare names in upper case so case doesn't matter
             if (fleet.get(index).getName().toUpperCase().equals(name.toUpperCase())) {
                 return fleet.get(index);
             }
